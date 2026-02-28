@@ -1,0 +1,93 @@
+---
+const faqs = [
+  {
+    question: "¿Cuándo es más barata la luz con tarifa regulada?",
+    answer:
+      "Con la tarifa PVPC, la luz suele ser más barata en la madrugada (de 0h a 8h) y en las horas centrales del día (de 13h a 16h). El tramo exacto varía cada día según la producción renovable y la demanda. Consulta la tabla de arriba para ver los precios de hoy actualizados hora a hora.",
+  },
+  {
+    question: "¿Qué hora es más barata para poner la lavadora hoy?",
+    answer:
+      "La hora más barata cambia cada día. En esta página puedes ver la franja verde en la tabla horaria, que indica el tramo más económico de hoy. En general, las madrugadas y las horas de máxima producción solar (mediodía) suelen ser las más baratas. Otros electrodomésticos de alto consumo como el lavavajillas, el horno o el secador también conviene usarlos en esas franjas.",
+  },
+  {
+    question: "¿Cuál es la compañía de luz más barata según la OCU?",
+    answer:
+      "Según la OCU, las comercializadoras independientes suelen ofrecer tarifas más baratas que las grandes eléctricas. Si tienes la tarifa regulada PVPC, el precio por kWh es el mismo con todas las distribuidoras acogidas al sistema: lo más importante es consumir en las horas baratas.",
+  },
+  {
+    question: "¿Qué compañía tiene el kWh más barato en España?",
+    answer:
+      "El precio del kWh depende del tipo de tarifa. Con la tarifa regulada (PVPC), el precio es idéntico para todos los consumidores acogidos, sin importar la distribuidora. Para tarifas libres, el comparador oficial de la CNMC te permite encontrar la oferta más barata según tu consumo.",
+  },
+  {
+    question: "¿Qué es el PVPC y cómo funciona?",
+    answer:
+      "El PVPC (Precio Voluntario para el Pequeño Consumidor) es la tarifa regulada de electricidad en España. Su precio varía cada hora del día en función del mercado mayorista (pool eléctrico). Lo gestiona Red Eléctrica de España (REE) y está disponible para hogares con potencia contratada de hasta 10 kW. Es la tarifa que muestra esta web.",
+  },
+  {
+    question: "¿Por qué cambia el precio de la luz cada hora?",
+    answer:
+      "El precio varía hora a hora porque se fija en el mercado mayorista eléctrico (OMIE) según la oferta y la demanda en cada franja. Cuando hay mucha producción renovable (solar y eólica) y poca demanda, el precio baja. Cuando la demanda es alta y la producción renovable escasa, el precio sube.",
+  },
+  {
+    question: "¿Cuánto vale de media el kWh en España en 2026?",
+    answer:
+      "El precio medio del kWh con tarifa PVPC en 2026 oscila habitualmente entre 0,08 y 0,16 €/kWh según la hora del día y la época del año. Los días con mucha generación solar o eólica pueden bajar de 0,05 €/kWh, mientras que en picos de demanda puede superar los 0,20 €/kWh.",
+  },
+  {
+    question: "¿Qué diferencia hay entre tarifa PVPC y tarifa libre?",
+    answer:
+      "La tarifa PVPC tiene un precio variable hora a hora fijado por el mercado. La tarifa libre tiene un precio fijado contractualmente con la comercializadora, que puede ser fijo o indexado. El PVPC puede ser más barato si se consume en horas valle; la tarifa fija da más previsibilidad en la factura.",
+  },
+  {
+    question: "¿Cómo puedo ahorrar en la factura de la luz?",
+    answer:
+      "La forma más efectiva con tarifa PVPC es desplazar el consumo a las horas más baratas: poner electrodomésticos de alto consumo (lavadora, lavavajillas, termo eléctrico) por la madrugada o en el mediodía solar. También ayuda revisar la potencia contratada, instalar un termostato inteligente y sustituir electrodomésticos viejos por clase A o superior.",
+  },
+  {
+    question: "¿Dónde se publican los precios oficiales de la luz?",
+    answer:
+      "Los precios del PVPC los publica Red Eléctrica de España (REE) a través de su API pública. Esta web consulta esos datos oficiales en tiempo real para mostrarte el precio de la luz de hoy hora a hora sin publicidad ni intermediarios.",
+  },
+];
+---
+
+<section class="mt-20" id="faqs" aria-labelledby="faqs-title">
+  <h2
+    id="faqs-title"
+    class="text-2xl font-bold text-slate-900 mb-8"
+  >
+    Preguntas frecuentes sobre el precio de la luz
+  </h2>
+  <div class="flex flex-col gap-3">
+    {
+      faqs.map((faq) => (
+        <details class="group bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+          <summary class="flex items-center justify-between gap-4 px-7 py-5 cursor-pointer list-none font-semibold text-slate-800 hover:text-slate-900 transition-colors select-none">
+            {faq.question}
+            <span class="shrink-0 w-5 h-5 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 group-open:rotate-45 transition-transform duration-200 text-lg leading-none">
+              +
+            </span>
+          </summary>
+          <div class="px-7 pb-6 text-slate-500 leading-relaxed text-sm">
+            {faq.answer}
+          </div>
+        </details>
+      ))
+    }
+  </div>
+</section>
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": faqs.map((faq) => ({
+    "@type": "Question",
+    "name": faq.question,
+    "acceptedAnswer": {
+      "@type": "Answer",
+      "text": faq.answer,
+    },
+  })),
+})} />

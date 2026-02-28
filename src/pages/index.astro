@@ -5,6 +5,7 @@ import { Info, Zap, Clock, TrendingDown, TrendingUp } from "lucide-react";
 import PriceChart from "../components/PriceChart";
 import Recommendations from "../components/Recommendations.astro";
 import PriceBar from "../components/PriceBar.astro";
+import FAQ from "../components/FAQ.astro";
 
 const prices = await getPrices();
 const currentPrice = getCurrentPrice(prices);
@@ -210,6 +211,9 @@ const hourlyChartData = prices.map((p) => ({
 
     <!-- Recomendaciones -->
     <Recommendations prices={prices} />
+
+    <!-- FAQ -->
+    <FAQ />
 
     <!-- Tabla completa -->
     <section class="mt-20" id="tabla">
