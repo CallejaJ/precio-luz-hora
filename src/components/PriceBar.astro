@@ -1,0 +1,110 @@
+---
+import type { PriceInfo } from "../lib/service";
+
+interface Props {
+  prices: PriceInfo[];
+}
+
+const { prices } = Astro.props;
+const currentHour = new Date().getHours();
+
+// Calculamos umbrales para los colores
+const sortedPrices = [...prices].map((p) => p.price).sort((a, b) => a - b);
+const min = sortedPrices[0];
+const max = sortedPrices[sortedPrices.length - 1];
+const range = max - min;
+
+const getLevel = (price: number) => {
+  const percent = (price - min) / range;
+  if (percent < 0.33) return "bg-emerald-500";
+  if (percent < 0.66) return "bg-amber-500";
+  return "bg-rose-500";
+};
+
+// Marcador de posición (0% a 100%)
+const markerPosition = (currentHour / 24) * 100;
+---
+
+<div
+  class="glass p-8 sm:p-10 rounded-[2.5rem] mb-16 relative overflow-hidden group"
+>
+  <div
+    class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 blur-3xl -z-10 group-hover:bg-emerald-500/10 transition-colors duration-700"
+  >
+  </div>
+
+  <div
+    class="flex flex-col md:flex-row justify-between items-center mb-10 gap-6"
+  >
+    <div>
+      <h2
+        class="text-2xl font-black text-slate-900 tracking-tight font-['Outfit'] mb-1"
+      >
+        Evolución horaria <span class="text-emerald-500 italic">hoy</span>
+      </h2>
+      <p class="text-slate-400 text-sm font-medium tracking-wide">
+        Mapa de calor del precio de la energía en tiempo real
+      </p>
+    </div>
+    <div
+      class="text-[10px] font-black px-4 py-2 bg-slate-900 text-white rounded-full tracking-[0.2em] uppercase"
+    >
+      {new Date().toLocaleDateString("es-ES")}
+    </div>
+  </div>
+
+  <div class="relative pt-10 pb-6 group">
+    <!-- Marcador de hora actual -->
+    <div
+      class="absolute top-0 flex flex-col items-center transition-all duration-500 ease-out z-10"
+      style={`left: ${markerPosition}%`}
+    >
+      <span
+        class="text-[10px] font-black text-slate-900 mb-1 bg-white px-2 py-0.5 rounded-full border border-slate-200"
+      >
+        {currentHour.toString().padStart(2, "0")}h
+      </span>
+      <div class="w-0.5 h-16 bg-slate-900 group-hover:h-20 transition-all">
+      </div>
+    </div>
+
+    <!-- Barra de colores -->
+    <div
+      class="h-4 w-full flex rounded-full overflow-hidden shadow-inner bg-slate-100"
+    >
+      {
+        prices.map((p) => (
+          <div
+            class={`h-full flex-1 ${getLevel(p.price)} transition-all hover:scale-y-125 cursor-help`}
+            title={`${p.hour}: ${p.price.toFixed(4)} €/kWh`}
+          />
+        ))
+      }
+    </div>
+
+    <!-- Etiquetas de tiempo -->
+    <div
+      class="flex justify-between mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest px-1"
+    >
+      <span>01h</span>
+      <span class="hidden sm:inline">06h</span>
+      <span class="hidden sm:inline">12h</span>
+      <span class="hidden sm:inline">18h</span>
+      <span>24h</span>
+    </div>
+  </div>
+
+  <div
+    class="flex justify-center gap-6 mt-4 text-[10px] font-black uppercase tracking-widest text-slate-400"
+  >
+    <div class="flex items-center gap-2 text-emerald-500">
+      <div class="w-2 h-2 rounded-full bg-emerald-500"></div> Barato
+    </div>
+    <div class="flex items-center gap-2 text-amber-500">
+      <div class="w-2 h-2 rounded-full bg-amber-500"></div> Medio
+    </div>
+    <div class="flex items-center gap-2 text-rose-500">
+      <div class="w-2 h-2 rounded-full bg-rose-500"></div> Caro
+    </div>
+  </div>
+</div>
