@@ -1,0 +1,312 @@
+---
+import Layout from "../layouts/layout.astro";
+import { getPrices, getCurrentPrice } from "../lib/service";
+import { Info, Zap, Clock, TrendingDown, TrendingUp } from "lucide-react";
+import PriceChart from "../components/PriceChart";
+import Recommendations from "../components/Recommendations.astro";
+import PriceBar from "../components/PriceBar.astro";
+
+const prices = await getPrices();
+const currentPrice = getCurrentPrice(prices);
+const avgPrice = prices.length
+  ? prices.reduce((acc, p) => acc + p.price, 0) / prices.length
+  : 0;
+const cheapest = [...prices].sort((a, b) => a.price - b.price)[0];
+const expensive = [...prices].sort((a, b) => b.price - a.price)[0];
+
+const isRising =
+  prices.indexOf(currentPrice) > 0 &&
+  currentPrice.price > prices[prices.indexOf(currentPrice) - 1].price;
+
+const hourlyChartData = prices.map((p) => ({
+  name: p.hour.split("-")[0],
+  price: p.price,
+}));
+---
+
+<Layout title="Precio de la luz hoy hora a hora - Oficial (Sin Publicidad)">
+  <div class="max-w-5xl mx-auto px-4 sm:px-6 py-16 overflow-x-hidden">
+    <!-- Branding & Tag -->
+    <header class="mb-20">
+      <div
+        class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-8 border border-slate-200/50"
+      >
+        <!-- <Zap size={12} /> precioluzhora.online -->
+      </div>
+
+      <div
+        class="flex flex-col gap-8 md:flex-row md:items-end md:justify-between md:gap-12"
+      >
+        <div class="flex-1">
+          <h1
+            class="text-2xl sm:text-3xl md:text-4xl font-semibold text-slate-900 mb-4 tracking-tight leading-tight"
+          >
+            Precio de la luz <span class="text-primary italic px-1 inline-block"
+              >hoy</span
+            >
+          </h1>
+          <div class="flex items-baseline gap-2">
+            <span
+              class="text-5xl sm:text-6xl md:text-7xl font-black text-slate-900 tracking-tighter"
+            >
+              {(currentPrice?.price || 0).toFixed(4)}
+            </span>
+            <span
+              class="text-base sm:text-xl font-bold text-slate-400 uppercase tracking-widest"
+              >€/kWh</span
+            >
+          </div>
+        </div>
+
+        <div class="max-w-md">
+          <p
+            class="text-base sm:text-lg text-slate-500 leading-relaxed font-medium"
+          >
+            Ideal si estás en casa o <span
+              class="text-slate-900 border-b-2 border-primary/20"
+              >teletrabajas</span
+            >: controla el gasto en tiempo real y optimiza tu ahorro hoy {
+              new Date().toLocaleDateString("es-ES")
+            }.
+          </p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Cards Principales -->
+    <div id="precios" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+      <!-- Card: Ahora -->
+      <div
+        class="glass p-10 rounded-[3rem] card-hover group relative overflow-hidden"
+      >
+        <div
+          class="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-2xl group-hover:bg-primary/10 transition-colors"
+        >
+        </div>
+        <div class="flex justify-between items-start mb-8">
+          <div class="flex flex-col">
+            <p
+              class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2"
+            >
+              Ahora mismo
+            </p>
+            <div
+              class="h-1.5 w-10 bg-primary rounded-full group-hover:w-16 transition-all duration-500"
+            >
+            </div>
+          </div>
+          <div
+            class={`p-3 rounded-2xl ${isRising ? "bg-rose-50 text-rose-500 ring-1 ring-rose-100" : "bg-emerald-50 text-emerald-500 ring-1 ring-emerald-100"}`}
+          >
+            {
+              isRising ? (
+                <TrendingUp size={22} strokeWidth={2.5} />
+              ) : (
+                <TrendingDown size={22} strokeWidth={2.5} />
+              )
+            }
+          </div>
+        </div>
+        <div>
+          <p
+            class="text-6xl font-black text-slate-900 tracking-tighter mb-2 font-['Outfit']"
+          >
+            {(currentPrice?.price || 0).toFixed(4)}
+          </p>
+          <p class="text-slate-400 text-sm font-bold tracking-widest uppercase">
+            €/kWh
+          </p>
+        </div>
+      </div>
+
+      <!-- Card: Mínimo -->
+      <div class="glass p-10 rounded-[3rem] card-hover group">
+        <div class="flex justify-between items-start mb-8">
+          <div class="flex flex-col">
+            <p
+              class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2"
+            >
+              Mínimo diario
+            </p>
+            <div
+              class="h-1.5 w-10 bg-emerald-400 rounded-full group-hover:w-16 transition-all duration-500"
+            >
+            </div>
+          </div>
+          <div
+            class="p-3 bg-emerald-50 rounded-2xl text-emerald-500 ring-1 ring-emerald-100"
+          >
+            <Clock size={22} strokeWidth={2.5} />
+          </div>
+        </div>
+        <div>
+          <p
+            class="text-6xl font-black text-slate-900 tracking-tighter mb-2 font-['Outfit']"
+          >
+            {cheapest?.hour}
+          </p>
+          <p
+            class="text-emerald-600 text-sm font-bold tracking-widest uppercase flex items-center gap-2"
+          >
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            {(cheapest?.price || 0).toFixed(4)} €/kWh
+          </p>
+        </div>
+      </div>
+
+      <!-- Card: Máximo -->
+      <div class="glass p-10 rounded-[3rem] card-hover group">
+        <div class="flex justify-between items-start mb-8">
+          <div class="flex flex-col">
+            <p
+              class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-2"
+            >
+              Máximo diario
+            </p>
+            <div
+              class="h-1.5 w-10 bg-rose-400 rounded-full group-hover:w-16 transition-all duration-500"
+            >
+            </div>
+          </div>
+          <div
+            class="p-3 bg-rose-50 rounded-2xl text-rose-500 ring-1 ring-rose-100"
+          >
+            <Info size={22} strokeWidth={2.5} />
+          </div>
+        </div>
+        <div>
+          <p
+            class="text-6xl font-black text-slate-900 tracking-tighter mb-2 font-['Outfit']"
+          >
+            {expensive?.hour}
+          </p>
+          <p
+            class="text-rose-600 text-sm font-bold tracking-widest uppercase flex items-center gap-2"
+          >
+            <span class="w-2 h-2 rounded-full bg-rose-400"></span>
+            {(expensive?.price || 0).toFixed(4)} €/kWh
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra de Evolución Diaria (Nueva) -->
+    <PriceBar prices={prices} />
+
+    <!-- Gráfico Isla - Hoy -->
+    <section class="mb-16">
+      <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+        <Zap className="text-amber-500" size={20} /> Evolución hoy hora a hora
+      </h2>
+      <p class="text-slate-400 text-sm font-medium mb-6">
+        Precio €/kWh · Línea punteada = media del día
+      </p>
+      <PriceChart
+        data={hourlyChartData}
+        currentHour={new Date().getHours()}
+        client:only="react"
+      />
+    </section>
+
+    <!-- Recomendaciones -->
+    <Recommendations prices={prices} />
+
+    <!-- Tabla completa -->
+    <section class="mt-20" id="tabla">
+      <h2 class="text-2xl font-bold text-slate-900 mb-8">
+        Precio de la luz por horas — {new Date().toLocaleDateString("es-ES")}
+      </h2>
+      <div
+        class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden"
+      >
+        <!-- Leyenda -->
+        <div
+          class="flex gap-4 px-8 py-4 border-b border-slate-50 text-[10px] font-black uppercase tracking-widest text-slate-400"
+        >
+          <span class="flex items-center gap-1.5"
+            ><span class="w-2 h-2 rounded-full bg-emerald-400 inline-block"
+            ></span> Barato</span
+          >
+          <span class="flex items-center gap-1.5"
+            ><span class="w-2 h-2 rounded-full bg-amber-400 inline-block"
+            ></span> Medio</span
+          >
+          <span class="flex items-center gap-1.5"
+            ><span class="w-2 h-2 rounded-full bg-rose-400 inline-block"></span> Caro</span
+          >
+          <span class="ml-auto flex items-center gap-1.5"
+            ><span class="w-2 h-2 rounded-full bg-slate-900 inline-block"
+            ></span> Ahora</span
+          >
+        </div>
+        {
+          (() => {
+            const minPrice = Math.min(...prices.map((p) => p.price));
+            const maxPrice = Math.max(...prices.map((p) => p.price));
+            const range = maxPrice - minPrice;
+            const getLevel = (price: number) => {
+              const pct = (price - minPrice) / range;
+              if (pct < 0.33)
+                return {
+                  color: "bg-emerald-400",
+                  text: "text-emerald-700",
+                  label: "Barato",
+                };
+              if (pct < 0.66)
+                return {
+                  color: "bg-amber-400",
+                  text: "text-amber-700",
+                  label: "Medio",
+                };
+              return {
+                color: "bg-rose-400",
+                text: "text-rose-700",
+                label: "Caro",
+              };
+            };
+            const getBarWidth = (price: number) => {
+              const pct = ((price - minPrice) / range) * 100;
+              return Math.max(4, Math.round(pct));
+            };
+            return prices.map((p) => {
+              const level = getLevel(p.price);
+              const isCurrent = p.hour === currentPrice?.hour;
+              return (
+                <div
+                  class={`flex items-center gap-4 px-8 py-4 border-b border-slate-50 last:border-b-0 transition-colors hover:bg-slate-50/60 ${isCurrent ? "bg-amber-50/40" : ""}`}
+                >
+                  {/* Hora */}
+                  <span
+                    class={`text-sm font-bold w-16 shrink-0 ${isCurrent ? "text-slate-900" : "text-slate-400"}`}
+                  >
+                    {p.hour.replace("-", "–")}h
+                    {isCurrent && (
+                      <span class="ml-1 text-[9px] font-black text-amber-500 uppercase tracking-widest">
+                        Ahora
+                      </span>
+                    )}
+                  </span>
+
+                  {/* Barra visual */}
+                  <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      class={`h-full rounded-full ${isCurrent ? "bg-slate-900" : level.color} transition-all`}
+                      style={`width: ${getBarWidth(p.price)}%`}
+                    />
+                  </div>
+
+                  {/* Precio */}
+                  <span
+                    class={`text-sm font-bold w-28 text-right shrink-0 ${isCurrent ? "text-slate-900" : level.text}`}
+                  >
+                    {p.price.toFixed(4)} €/kWh
+                  </span>
+                </div>
+              );
+            });
+          })()
+        }
+      </div>
+    </section>
+  </div>
+</Layout>
