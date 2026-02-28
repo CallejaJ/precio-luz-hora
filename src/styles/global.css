@@ -1,0 +1,44 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #ffaa00; /* Vibrant Electric Gold */
+  --color-primary-hover: #ff9500;
+  --color-secondary: #0f172a; /* Deep Slate/Navy */
+  --color-accent-blue: #00d2ff; /* Electric Cyan */
+  --color-accent-rose: #ff2d55; /* Modern Rose */
+}
+
+@layer base {
+  html {
+    overflow-x: clip;
+  }
+  html,
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: "Outfit", "Inter", system-ui, sans-serif;
+    width: 100%;
+    max-width: 100vw;
+  }
+}
+
+@layer utilities {
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.07)];
+  }
+
+  .mesh-gradient {
+    background-color: #f8fafc;
+    background-image:
+      radial-gradient(at 0% 0%, hsla(28, 100%, 74%, 0.15) 0, transparent 50%),
+      radial-gradient(at 50% 0%, hsla(189, 100%, 56%, 0.1) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(355, 100%, 73%, 0.15) 0, transparent 50%);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(255, 170, 0, 0.3);
+  }
+
+  .card-hover {
+    @apply transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)];
+  }
+}
