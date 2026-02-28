@@ -1,11 +1,6 @@
 # PrecioLuzHora
 
-<img src="https://img.shields.io/badge/Astro-5.x-FF5D01?style=for-the-badge&logo=astro" alt="Astro" />
-<img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react" alt="React" />
-<img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript" />
-<img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss" alt="Tailwind CSS" />
-<img src="https://img.shields.io/badge/Recharts-3-22C55E?style=for-the-badge" alt="Recharts" />
-<img src="https://img.shields.io/badge/Data_Source-REE_API-003087?style=for-the-badge" alt="REE API" />
+<img src="https://img.shields.io/badge/Astro-5.x-FF5D01?style=for-the-badge&logo=astro" alt="Astro" /> <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react" alt="React" /> <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript" alt="TypeScript" /> <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?style=for-the-badge&logo=tailwindcss" alt="Tailwind CSS" /> <img src="https://img.shields.io/badge/Recharts-3-22C55E?style=for-the-badge" alt="Recharts" /> <img src="https://img.shields.io/badge/Data_Source-REE_API-003087?style=for-the-badge" alt="REE API" />
 
 *Real-time Spanish PVPC electricity price tracker with hourly breakdowns, interactive charts, and energy-saving recommendations.*
 
