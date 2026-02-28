@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bulbGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <!-- Sombra suave para profundidad -->
+  <circle cx="50" cy="50" r="48" fill="#f8fafc" />
+  <!-- Base de la bombilla (Azul Seguridad) -->
+  <path d="M40 75 L60 75 L58 85 L42 85 Z" fill="#1e293b" />
+  <path d="M42 87 L58 87 L57 92 L43 92 Z" fill="#334155" />
+  <!-- Cristal de la bombilla (Naranja Energía) -->
+  <path d="M50 15 C30 15 15 30 15 50 C15 65 25 75 40 75 L60 75 C75 75 85 65 85 50 C85 30 70 15 50 15 Z" fill="url(#bulbGradient)" />
+  <!-- Filamento (Blanco/Brillo) -->
+  <path d="M45 50 Q50 40 55 50 T65 50" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+  <!-- Reflejo de cristal -->
+  <path d="M30 35 C35 30 45 28 50 28" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.5" stroke-linecap="round" />
+</svg>
