@@ -46,7 +46,7 @@ export default function PriceChart({
 
   return (
     <div
-      className="h-[320px] w-full bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden"
+      className="h-[320px] w-full bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden select-none"
       style={{ display: "block" }}
     >
       <ResponsiveContainer width="100%" height="100%" minWidth={0}>
