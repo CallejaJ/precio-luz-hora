@@ -47,7 +47,8 @@ export default function PriceChart({
   return (
     <div
       className="h-[320px] w-full bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden select-none"
-      style={{ display: "block" }}
+      style={{ display: "block", userSelect: "none" }}
+      onMouseDown={(e) => e.preventDefault()}
     >
       <ResponsiveContainer width="100%" height="100%" minWidth={0}>
         <AreaChart
