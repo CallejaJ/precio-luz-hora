@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   AreaChart,
   Area,
@@ -39,8 +39,34 @@ export default function PriceChart({
   data,
   dataKey = "price",
   nameKey = "name",
-  currentHour,
+  currentHour: initialHour,
 }: Props) {
+  const [currentHour, setCurrentHour] = useState<number | undefined>(initialHour);
+
+  useEffect(() => {
+    // Calcular la hora actual en la zona horaria de Madrid
+    const getCurrentHourSpain = () => {
+      const hour = parseInt(
+        new Date().toLocaleString("es-ES", {
+          timeZone: "Europe/Madrid",
+          hour: "2-digit",
+          hour12: false,
+        }),
+        10
+      );
+      return hour;
+    };
+
+    setCurrentHour(getCurrentHourSpain());
+
+    // Actualizar cada minuto
+    const interval = setInterval(() => {
+      setCurrentHour(getCurrentHourSpain());
+    }, 60000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const prices = data.map((d) => d[dataKey] as number).filter(Boolean);
   const avg = prices.reduce((a, b) => a + b, 0) / prices.length;
 
