@@ -6,7 +6,14 @@ interface Props {
 }
 
 const { prices } = Astro.props;
-const currentHour = new Date().getHours();
+const currentHour = parseInt(
+  new Date().toLocaleString("es-ES", {
+    timeZone: "Europe/Madrid",
+    hour: "2-digit",
+    hour12: false,
+  }),
+  10,
+);
 
 // Calculamos umbrales para los colores
 const sortedPrices = [...prices].map((p) => p.price).sort((a, b) => a - b);
@@ -49,7 +56,7 @@ const markerPosition = (currentHour / 24) * 100;
     <div
       class="text-[10px] font-black px-4 py-2 bg-slate-900 text-white rounded-full tracking-[0.2em] uppercase"
     >
-      {new Date().toLocaleDateString("es-ES")}
+      {new Date().toLocaleDateString("es-ES", { timeZone: "Europe/Madrid" })}
     </div>
   </div>
 

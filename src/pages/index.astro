@@ -8,21 +8,39 @@ import PriceBar from "../components/PriceBar.astro";
 import FAQ from "../components/FAQ.astro";
 
 const prices = await getPrices();
-const currentPrice = getCurrentPrice(prices);
-const avgPrice = prices.length
-  ? prices.reduce((acc, p) => acc + p.price, 0) / prices.length
-  : 0;
-const cheapest = [...prices].sort((a, b) => a.price - b.price)[0];
-const expensive = [...prices].sort((a, b) => b.price - a.price)[0];
+const currentPrice = prices ? getCurrentPrice(prices) : null;
+const avgPrice =
+  prices && prices.length
+    ? prices.reduce((acc, p) => acc + p.price, 0) / prices.length
+    : 0;
+const cheapest = prices
+  ? [...prices].sort((a, b) => a.price - b.price)[0]
+  : null;
+const expensive = prices
+  ? [...prices].sort((a, b) => b.price - a.price)[0]
+  : null;
 
 const isRising =
-  prices.indexOf(currentPrice) > 0 &&
-  currentPrice.price > prices[prices.indexOf(currentPrice) - 1].price;
+  prices && currentPrice
+    ? prices.indexOf(currentPrice) > 0 &&
+      currentPrice.price > prices[prices.indexOf(currentPrice) - 1].price
+    : false;
 
-const hourlyChartData = prices.map((p) => ({
-  name: p.hour.split("-")[0],
-  price: p.price,
-}));
+const hourlyChartData = prices
+  ? prices.map((p) => ({ name: p.hour.split("-")[0], price: p.price }))
+  : [];
+
+const todayEs = new Date().toLocaleDateString("es-ES", {
+  timeZone: "Europe/Madrid",
+});
+const currentHourSpain = parseInt(
+  new Date().toLocaleString("es-ES", {
+    timeZone: "Europe/Madrid",
+    hour: "2-digit",
+    hour12: false,
+  }),
+  10,
+);
 ---
 
 <Layout title="Precio de la luz hoy hora a hora - Oficial (Sin Publicidad)">
@@ -50,12 +68,15 @@ const hourlyChartData = prices.map((p) => ({
             <span
               class="text-5xl sm:text-6xl md:text-7xl font-black text-slate-900 tracking-tighter"
             >
-              {(currentPrice?.price || 0).toFixed(4)}
+              {currentPrice ? currentPrice.price.toFixed(4) : "—"}
             </span>
-            <span
-              class="text-base sm:text-xl font-bold text-slate-400 uppercase tracking-widest"
-              >€/kWh</span
-            >
+            {
+              currentPrice && (
+                <span class="text-base sm:text-xl font-bold text-slate-400 uppercase tracking-widest">
+                  €/kWh
+                </span>
+              )
+            }
           </div>
         </div>
 
@@ -67,12 +88,22 @@ const hourlyChartData = prices.map((p) => ({
               class="text-slate-900 border-b-2 border-primary/20"
               >teletrabajas</span
             >: controla el gasto en tiempo real y optimiza tu ahorro hoy {
-              new Date().toLocaleDateString("es-ES")
+              todayEs
             }.
           </p>
         </div>
       </div>
     </header>
+
+    <!-- Banner: sin datos -->
+    {
+      !prices && (
+        <div class="mb-10 px-5 py-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-700 text-sm font-medium">
+          ⚠️ Datos no disponibles en este momento. La API de Red Eléctrica no ha
+          respondido. Inténtalo de nuevo en unos minutos.
+        </div>
+      )
+    }
 
     <!-- Cards Principales -->
     <div id="precios" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
@@ -112,11 +143,15 @@ const hourlyChartData = prices.map((p) => ({
           <p
             class="text-6xl font-black text-slate-900 tracking-tighter mb-2 font-['Outfit']"
           >
-            {(currentPrice?.price || 0).toFixed(4)}
+            {currentPrice ? currentPrice.price.toFixed(4) : "—"}
           </p>
-          <p class="text-slate-400 text-sm font-bold tracking-widest uppercase">
-            €/kWh
-          </p>
+          {
+            currentPrice && (
+              <p class="text-slate-400 text-sm font-bold tracking-widest uppercase">
+                €/kWh
+              </p>
+            )
+          }
         </div>
       </div>
 
@@ -144,14 +179,16 @@ const hourlyChartData = prices.map((p) => ({
           <p
             class="text-6xl font-black text-slate-900 tracking-tighter mb-2 font-['Outfit']"
           >
-            {cheapest?.hour}
+            {cheapest ? cheapest.hour : "—"}
           </p>
-          <p
-            class="text-emerald-600 text-sm font-bold tracking-widest uppercase flex items-center gap-2"
-          >
-            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-            {(cheapest?.price || 0).toFixed(4)} €/kWh
-          </p>
+          {
+            cheapest && (
+              <p class="text-emerald-600 text-sm font-bold tracking-widest uppercase flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400" />
+                {cheapest.price.toFixed(4)} €/kWh
+              </p>
+            )
+          }
         </div>
       </div>
 
@@ -179,38 +216,45 @@ const hourlyChartData = prices.map((p) => ({
           <p
             class="text-6xl font-black text-slate-900 tracking-tighter mb-2 font-['Outfit']"
           >
-            {expensive?.hour}
+            {expensive ? expensive.hour : "—"}
           </p>
-          <p
-            class="text-rose-600 text-sm font-bold tracking-widest uppercase flex items-center gap-2"
-          >
-            <span class="w-2 h-2 rounded-full bg-rose-400"></span>
-            {(expensive?.price || 0).toFixed(4)} €/kWh
-          </p>
+          {
+            expensive && (
+              <p class="text-rose-600 text-sm font-bold tracking-widest uppercase flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-rose-400" />
+                {expensive.price.toFixed(4)} €/kWh
+              </p>
+            )
+          }
         </div>
       </div>
     </div>
 
     <!-- Barra de Evolución Diaria (Nueva) -->
-    <PriceBar prices={prices} />
+    {prices && <PriceBar prices={prices} />}
 
     <!-- Gráfico Isla - Hoy -->
-    <section class="mb-16">
-      <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
-        <Zap className="text-amber-500" size={20} /> Evolución hoy hora a hora
-      </h2>
-      <p class="text-slate-400 text-sm font-medium mb-6">
-        Precio €/kWh · Línea punteada = media del día
-      </p>
-      <PriceChart
-        data={hourlyChartData}
-        currentHour={new Date().getHours()}
-        client:only="react"
-      />
-    </section>
+    {
+      prices && (
+        <section class="mb-16">
+          <h2 class="text-xl font-bold text-slate-900 mb-2 flex items-center gap-2">
+            <Zap className="text-amber-500" size={20} /> Evolución hoy hora a
+            hora
+          </h2>
+          <p class="text-slate-400 text-sm font-medium mb-6">
+            Precio €/kWh · Línea punteada = media del día
+          </p>
+          <PriceChart
+            data={hourlyChartData}
+            currentHour={currentHourSpain}
+            client:only="react"
+          />
+        </section>
+      )
+    }
 
     <!-- Recomendaciones -->
-    <Recommendations prices={prices} />
+    {prices && <Recommendations prices={prices} />}
 
     <!-- FAQ -->
     <FAQ />
@@ -218,7 +262,7 @@ const hourlyChartData = prices.map((p) => ({
     <!-- Tabla completa -->
     <section class="mt-20" id="tabla">
       <h2 class="text-2xl font-bold text-slate-900 mb-8">
-        Precio de la luz por horas — {new Date().toLocaleDateString("es-ES")}
+        Precio de la luz por horas — {todayEs}
       </h2>
       <div
         class="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden"
@@ -244,6 +288,11 @@ const hourlyChartData = prices.map((p) => ({
           >
         </div>
         {
+          !prices ? (
+            <p class="px-8 py-12 text-slate-400 text-sm font-medium text-center">
+              Datos no disponibles
+            </p>
+          ) : (
           (() => {
             const minPrice = Math.min(...prices.map((p) => p.price));
             const maxPrice = Math.max(...prices.map((p) => p.price));
@@ -309,6 +358,7 @@ const hourlyChartData = prices.map((p) => ({
               );
             });
           })()
+          )
         }
       </div>
     </section>

@@ -11,13 +11,15 @@ export interface PriceInfo {
 /**
  * Fetches today's hourly PVPC electricity prices from the official REE (Red Eléctrica de España) API.
  * Docs: https://www.ree.es/es/datos/apidatos
- * Fallback: Returns realistic static data if the API is unreachable.
+ * Returns null if the API is unreachable.
  */
-export async function getPrices(): Promise<PriceInfo[]> {
-  const today = new Date();
-  const pad = (n: number) => n.toString().padStart(2, "0");
-  const startDate = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}T00:00`;
-  const endDate = `${today.getFullYear()}-${pad(today.getMonth() + 1)}-${pad(today.getDate())}T23:59`;
+export async function getPrices(): Promise<PriceInfo[] | null> {
+  // Use Spain timezone (Europe/Madrid = CET UTC+1 / CEST UTC+2) to get the correct date
+  const todayInSpain = new Date().toLocaleDateString("sv-SE", {
+    timeZone: "Europe/Madrid",
+  }); // "YYYY-MM-DD"
+  const startDate = `${todayInSpain}T00:00`;
+  const endDate = `${todayInSpain}T23:59`;
 
   try {
     // API oficial de Red Eléctrica de España (REE / Redeia)
@@ -40,12 +42,15 @@ export async function getPrices(): Promise<PriceInfo[]> {
 
     const values: { value: number; datetime: string }[] =
       pvpcIndicator.attributes.values;
-    const prices = values.map((v, i) => {
+    const prices = values.map((v) => {
       const dt = new Date(v.datetime);
       const h = dt.getHours();
+      const pad = (n: number) => n.toString().padStart(2, "0");
       const priceKwh = v.value / 1000; // REE devuelve €/MWh => convertir a €/kWh
       return {
-        date: today.toLocaleDateString("es-ES"),
+        date: new Date().toLocaleDateString("es-ES", {
+          timeZone: "Europe/Madrid",
+        }),
         hour: `${pad(h)}-${pad(h + 1)}`,
         is_cheap: false,
         is_under_avg: false,
@@ -65,28 +70,8 @@ export async function getPrices(): Promise<PriceInfo[]> {
       is_under_avg: p.price < avg,
     }));
   } catch (error) {
-    console.warn(
-      "⚠️ API de REE no disponible. Usando datos de respaldo estáticos.",
-      error,
-    );
-    const fallbackPrices = [
-      0.12684, 0.12231, 0.1185, 0.1152, 0.1121, 0.11045, 0.1159, 0.1284, 0.1452,
-      0.1581, 0.1623, 0.1554, 0.1421, 0.1385, 0.1352, 0.1389, 0.1484, 0.1652,
-      0.1854, 0.1921, 0.1885, 0.1752, 0.1584, 0.1382,
-    ];
-    const avg =
-      fallbackPrices.reduce((a, b) => a + b, 0) / fallbackPrices.length;
-    const sorted = [...fallbackPrices].sort((a, b) => a - b);
-    const lowThreshold = sorted[Math.floor(sorted.length * 0.33)];
-    return Array.from({ length: 24 }).map((_, i) => ({
-      date: today.toLocaleDateString("es-ES"),
-      hour: `${i.toString().padStart(2, "0")}-${(i + 1).toString().padStart(2, "0")}`,
-      is_cheap: fallbackPrices[i] <= lowThreshold,
-      is_under_avg: fallbackPrices[i] < avg,
-      market: "PVPC",
-      price: fallbackPrices[i],
-      units: "€/kWh",
-    }));
+    console.warn("⚠️ API de REE no disponible.", error);
+    return null;
   }
 }
 
@@ -115,7 +100,15 @@ export async function getMonthlyPrices(): Promise<
 }
 
 export function getCurrentPrice(prices: PriceInfo[]) {
-  const currentHour = new Date().getHours();
+  // Use Spain timezone to get the correct current hour
+  const currentHour = parseInt(
+    new Date().toLocaleString("es-ES", {
+      timeZone: "Europe/Madrid",
+      hour: "2-digit",
+      hour12: false,
+    }),
+    10,
+  );
   const pad = (n: number) => n.toString().padStart(2, "0");
   const hourString = `${pad(currentHour)}-${pad(currentHour + 1)}`;
   return prices.find((p) => p.hour === hourString) || prices[0];
