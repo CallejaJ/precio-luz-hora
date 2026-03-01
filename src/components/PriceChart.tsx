@@ -41,7 +41,9 @@ export default function PriceChart({
   nameKey = "name",
   currentHour: initialHour,
 }: Props) {
-  const [currentHour, setCurrentHour] = useState<number | undefined>(initialHour);
+  const [currentHour, setCurrentHour] = useState<number | undefined>(
+    initialHour,
+  );
 
   useEffect(() => {
     // Calcular la hora actual en la zona horaria de Madrid
@@ -52,7 +54,7 @@ export default function PriceChart({
           hour: "2-digit",
           hour12: false,
         }),
-        10
+        10,
       );
       return hour;
     };
